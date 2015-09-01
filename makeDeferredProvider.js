@@ -36,7 +36,7 @@ function makeDeferredProvider(nameSpace) {
 			return this.remoteObject.get(f);
 		}
 
-		promiseRemoteObject.retrieve=function(opts) {
+		promiseRemoteObject.retrieve = function(opts) {
 			var deferred = $.Deferred();
 			this.remoteObject.retrieve(opts, function(err, records) {
 				if (err) {
@@ -49,7 +49,7 @@ function makeDeferredProvider(nameSpace) {
 			return deferred.promise();
 		}
 
-		promiseRemoteObject.create=function(fvs) {
+		promiseRemoteObject.create = function(fvs) {
 			var deferred = $.Deferred();
 			fvs = fvs ? fvs:this.remoteObject._props;
 			this.remoteObject.create(fvs,function(err, result, e) {
