@@ -1,7 +1,13 @@
 ## Overview
-Augment [Visualforce Remote Objects](http://www.salesforce.com/us/developer/docs/pages/Content/pages_remote_objects.htm "Remote Objects") to provide promises.
+Augment [Visualforce Remote Objects](http://www.salesforce.com/us/developer/docs/pages/Content/pages_remote_objects.htm "Remote Objects") to provide RSVP.js promises.
+
+
+## Project Status
+
+Still under active development. Do not use this in production.
+
 ## Setup
-First, jQuery is required, as that's what provides the deferred/promises framework. After that's included, make sure `makeDeferredProvider.js` (or `makePreferredProvider.min.js`) is included.
+First, jQuery / Ember.js is required, as that's what provides the deferred/promises framework. After that's included, make sure `makeDeferredProvider.js` (or `makePreferredProvider.min.js`) is included.
 
 Then, simply call
 
