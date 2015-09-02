@@ -15,91 +15,110 @@
  *        var c = RemotingJSNameSpace.deferredObject('contact');
  *
  */
-var makeDeferredGlobal = (function () {
-	return this || (1, eval)('this');
+var vfrp = (function () {
+    return this || (1, eval)('this');
 }());
 
 function makeDeferredProvider(nameSpace) {
 
 // Default to "SObjectModel", which is the VF Remote Object default as well
-	nameSpace = nameSpace ? nameSpace : "SObjectModel";
+    nameSpace = nameSpace ? nameSpace : "SObjectModel";
 
 // Add a function to our VF Remote Objects object
-	makeDeferredGlobal[nameSpace].deferredObject=function(obj,vars) {
-		var promiseRemoteObject={};
-		promiseRemoteObject.remoteObject=new this[obj](vars);
+    vfrp[nameSpace].deferredObject = function(obj,vars) {
 
-		promiseRemoteObject.set=function(f,v) {
-			this.remoteObject.set(f,v);
-		}
-		promiseRemoteObject.get=function(f) {
-			return this.remoteObject.get(f);
-		}
+        var promiseRemoteObject = {};
+        promiseRemoteObject.remoteObject = new this[obj](vars);
 
-		promiseRemoteObject.retrieve = function(opts) {
-			var deferred = $.Deferred();
-			this.remoteObject.retrieve(opts, function(err, records) {
-				if (err) {
-					deferred.reject(err);
-				}
-				else {
-					deferred.resolve(records);
-				}
-			});
-			return deferred.promise();
-		}
 
-		promiseRemoteObject.create = function(fvs) {
-			var deferred = $.Deferred();
-			fvs = fvs ? fvs:this.remoteObject._props;
-			this.remoteObject.create(fvs,function(err, result, e) {
-				if (err) {
-					deferred.reject(err);
-				}
-				else {
-					deferred.resolve(result, e);
-				}
-			});
-			return deferred.promise();
-		}
+        promiseRemoteObject.set = function(f,v) {
+            this.remoteObject.set(f,v);
+        }
 
-		promiseRemoteObject.update=function(ids,fvs) {
-			var deferred = $.Deferred();
 
-// If our ids object isn't an array, the user probably didn't want to include ids
-// so let's assume that the first argument should be our field-value pairs instead
-			if (!(ids instanceof Array)) {
-				fvs=ids;
-				ids=null;
-			}
-			ids = ids ? ids : [this.remoteObject._props.Id];
-			fvs = fvs ? fvs:this.remoteObject._props;
-			console.log(this.remoteObject._props);
-			console.log(ids);
-			this.remoteObject.update(ids,fvs,function(err, ids) {
-				if (err) {
-					deferred.reject(err);
-				}
-				else {
-					deferred.resolve(ids);
-				}
-			});
-			return deferred.promise();
-		}
+        promiseRemoteObject.get = function(f) {
+            return this.remoteObject.get(f);
+        }
 
-		promiseRemoteObject.del=function(ids) {
-			var deferred = $.Deferred();
-			ids = ids ? ids : [this.remoteObject._props.Id];
-			this.remoteObject.del(ids,function(err, ids) {
-				if (err) {
-					deferred.reject(err);
-				}
-				else {
-					deferred.resolve(ids);
-				}
-			});
-			return deferred.promise();
-		}
-		return promiseRemoteObject;
-	};
+
+        promiseRemoteObject.retrieve = function(opts) {
+
+            return Ember.RSVP.Promise( function (resolve, reject) {
+                this.remoteObject.retrieve(opts, function(error, records) {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        resolve(records);
+                    }
+                });
+
+        });
+
+
+        promiseRemoteObject.create = function(fvs) {
+
+            return new Ember.RSVP.Promise(function (resolve, reject) {
+
+                fvs = fvs ? fvs : this.remoteObject._props;
+
+                this.remoteObject.create(fvs,function(err, result, e) {
+                    if (err) {
+                        deferred.reject(err);
+                    }
+                    else {
+                        deferred.resolve(result, e);
+                    }
+                });
+
+            });
+
+        }
+
+
+        promiseRemoteObject.update = function(ids,fvs) {
+
+            return new Ember.RSVP.Promise(function (resolve, reject) {
+
+                // If our ids object isn't an array, the user probably didn't want to include ids
+                // so let's assume that the first argument should be our field-value pairs instead
+                if (!(ids instanceof Array)) {
+                    fvs = ids;
+                    ids = null;
+                }
+                ids = ids ? ids : [this.remoteObject._props.Id];
+                fvs = fvs ? fvs:this.remoteObject._props;
+                console.log(this.remoteObject._props);
+                console.log(ids);
+                this.remoteObject.update(ids,fvs,function(err, ids) {
+                    if (err) {
+                        deferred.reject(err);
+                    }
+                    else {
+                        deferred.resolve(ids);
+                    }
+                });
+
+            });
+        }
+
+
+        promiseRemoteObject.del = function(ids) {
+
+            return new Ember.RSVP.Promise(function (resolve, reject) {
+
+                ids = ids ? ids : [this.remoteObject._props.Id];
+
+                this.remoteObject.del(ids,function(err, ids) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve(ids);
+                    }
+                });
+
+            });
+
+        };
+
 }
